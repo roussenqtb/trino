@@ -20,23 +20,42 @@ services:
       MINIO_SECRET_KEY: minio123      
     networks:
       - roussenq
-  trino:
-    image: trinodb/trino:latest
-    container_name: trino
-    hostname: trino   
-    ports:
-      - "8080:8080"
-    environment:      
-      - TRINO_NODE_ENVIRONMENT=production
+
+  trino-coordinator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: trino-coordinator
+    environment:
+      - TRINO_ENVIRONMENT=production
     volumes:
       - ./etc:/usr/lib/trino/etc
-      - ./catalog:/etc/trino/catalog    
+      - ./catalog:/etc/trino/catalog
+    ports:
+      - "8080:8080"
+    depends_on:
+      - minio
     networks:
-      - roussenq   
+      - roussenq         
+
+  trino-worker:
+    image: trinodb/trino:latest
+    container_name: trino-worker
+    environment:
+      - TRINO_ENVIRONMENT=production
+      - TRINO_DISCOVERY_URI=http://trino-coordinator:8080
+    volumes:
+      - ./etc:/usr/lib/trino/etc
+      - ./catalog:/etc/trino/catalog
+    depends_on:
+      - trino-coordinator
+    networks:
+      - roussenq         
 
   hive-metastore:
     image: 'apache/hive:4.0.0'
     hostname: hive-metastore
+    container_name: hive
     ports:
       - '9083:9083' # Metastore Thrift
     volumes:
