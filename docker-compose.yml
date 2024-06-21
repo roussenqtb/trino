@@ -68,4 +68,47 @@ services:
     depends_on:
       - minio
     networks:
-      - roussenq     
+      - roussenq  
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: mssqlserver
+    hostname: mssqlserver
+    environment:
+      SA_PASSWORD: "SqlServer2019!"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
+    ports:
+      - "1433:1433"
+    networks:
+      - roussenq        
+
+  postgresdb:
+    image: 'postgres:latest'
+    hostname: postgresdb
+    ports:
+      - '5442:5432'
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: estudo
+    networks:
+      - roussenq
+
+  oracle:      
+    image: oracleinanutshell/oracle-xe-11g:latest
+    container_name: oracle11g
+    hostname: oracle11g        
+    ports:
+      - 1521:1521
+      - 5500:5500
+    environment: 
+      - "ORACLE_PWD=oracle"
+      - "SOURCE_SCHEMA=change-or-delete-me"
+      - "SOURCE_TABLESPACE=change-or-delete-me"
+      - "EXCLUDE=user"
+      #sid: xe
+      #username: system
+      #password: oracle
+    networks:
+      - roussenq      

@@ -1,10 +1,10 @@
-select id_pessoa,nome,cpf,email,'oracle'as origem from oracle.estudo.pessoa
-union
-select id,nome,cpf,email,'postgres'as origem from postgresql.pessoa.pessoa
-union
-select id,nome,cpf,email,'sqlserver'as origem from sqlserver.pessoa.pessoa 
-union
-select id,nome,cpf,email,'minio parquet'as origem from minio.bronze.pessoas_parquet 
-union
-select id,nome,cpf,email,'minio parquet'as origem from minio.bronze.pessoas_csv 
-order by cpf
+SELECT ID_PESSOA,NOME,CPF,EMAIL,'ORACLE'AS ORIGEM FROM ORACLE.ESTUDO.PESSOA
+UNION
+SELECT ID,NOME,CPF,EMAIL,'POSTGRES'AS ORIGEM FROM POSTGRESQL.PESSOA.PESSOA
+UNION
+SELECT ID,NOME,CPF,EMAIL,'SQLSERVER'AS ORIGEM FROM SQLSERVER.PESSOA.PESSOA 
+UNION
+SELECT ID,NOME,CPF,EMAIL,'PARQUET'AS ORIGEM FROM MINIO.BRONZE.PESSOAS_PARQUET 
+UNION
+SELECT CAST(ID AS INTEGER)AS ID,NOME,CPF,EMAIL,'CSV'AS ORIGEM FROM MINIO.BRONZE.PESSOAS_CSV 
+ORDER BY CPF

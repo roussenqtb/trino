@@ -2,7 +2,7 @@ CREATE SCHEMA IF NOT EXISTS minio.bronze
 WITH (location = 's3a://bronze/');
 
 CREATE TABLE IF NOT EXISTS minio.bronze.pessoas_parquet(
-  id VARCHAR,
+  id INT,
   nome VARCHAR,
   cpf VARCHAR,
   email VARCHAR
