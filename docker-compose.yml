@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 networks:
   roussenq:
@@ -6,25 +6,21 @@ networks:
 
 services:
   minio:
-    image: 'minio/minio:latest'
+    image: "minio/minio:latest"
     container_name: minio
-    hostname: minio        
+    hostname: minio
     ports:
       - "9000:9000"
       - "9001:9001"
     command: server /data --console-address ":9001"
-    volumes:
-      - /mnt/d/volume/minio:/data
     environment:
       MINIO_ACCESS_KEY: minio
-      MINIO_SECRET_KEY: minio123      
+      MINIO_SECRET_KEY: minio123
     networks:
       - roussenq
 
   trino-coordinator:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: trinodb/trino:latest
     container_name: trino-coordinator
     environment:
       - TRINO_ENVIRONMENT=production
@@ -36,7 +32,7 @@ services:
     depends_on:
       - minio
     networks:
-      - roussenq         
+      - roussenq
 
   trino-worker:
     image: trinodb/trino:latest
@@ -50,14 +46,14 @@ services:
     depends_on:
       - trino-coordinator
     networks:
-      - roussenq         
+      - roussenq
 
   hive-metastore:
-    image: 'apache/hive:4.0.0'
+    image: "apache/hive:4.0.0"
     hostname: hive-metastore
     container_name: hive
     ports:
-      - '9083:9083' # Metastore Thrift
+      - "9083:9083"
     volumes:
       - ./conf/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml:ro
       - ./conf/metastore-site.xml:/opt/apache-hive-metastore-4.0.0-bin/conf/metastore-site.xml:ro
@@ -68,7 +64,7 @@ services:
     depends_on:
       - minio
     networks:
-      - roussenq  
+      - roussenq
 
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2019-latest
@@ -81,13 +77,13 @@ services:
     ports:
       - "1433:1433"
     networks:
-      - roussenq        
+      - roussenq
 
   postgresdb:
-    image: 'postgres:latest'
+    image: "postgres:latest"
     hostname: postgresdb
     ports:
-      - '5442:5432'
+      - "5442:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -95,14 +91,14 @@ services:
     networks:
       - roussenq
 
-  oracle:      
+  oracle:
     image: oracleinanutshell/oracle-xe-11g:latest
     container_name: oracle11g
-    hostname: oracle11g        
+    hostname: oracle11g
     ports:
       - 1521:1521
       - 5500:5500
-    environment: 
+    environment:
       - "ORACLE_PWD=oracle"
       - "SOURCE_SCHEMA=change-or-delete-me"
       - "SOURCE_TABLESPACE=change-or-delete-me"
@@ -111,4 +107,4 @@ services:
       #username: system
       #password: oracle
     networks:
-      - roussenq      
+      - roussenq
