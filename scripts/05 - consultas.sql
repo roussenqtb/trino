@@ -1,12 +1,12 @@
-SELECT ID_PESSOA,NOME,CPF,EMAIL,'ORACLE'AS ORIGEM FROM ORACLE.ESTUDO.PESSOA
-UNION
-SELECT ID,NOME,CPF,EMAIL,'POSTGRES'AS ORIGEM FROM POSTGRESQL.PESSOA.PESSOA
-UNION
-SELECT ID,NOME,CPF,EMAIL,'SQLSERVER'AS ORIGEM FROM SQLSERVER.PESSOA.PESSOA 
-UNION
-SELECT ID,NOME,CPF,EMAIL,'PARQUET'AS ORIGEM FROM MINIO.BRONZE.PESSOA_PARQUET 
-UNION
-SELECT CAST(ID AS INTEGER)AS ID,NOME,CPF,EMAIL,'CSV'AS ORIGEM FROM MINIO.BRONZE.PESSOA_CSV 
-UNION
-SELECT ID,NOME,CPF,EMAIL,'JSON'AS ORIGEM FROM MINIO.BRONZE.PESSOA_JSON
-ORDER BY CPF
+select id_pessoa,nome,cpf,email,'ORACLE'as origem from oracle.estudo.pessoa
+union
+select id,nome,cpf,email,'POSTGRES'as origem from postgresql.pessoa.pessoa
+union
+select id,nome,cpf,email,'SQLSERVER'as origem from sqlserver.pessoa.pessoa 
+union
+select id,nome,cpf,email,'PARQUET'as origem from minio.bronze.pessoa_parquet 
+union
+select cast(id as integer)as id,nome,cpf,email,'CSV'as origem from minio.bronze.pessoa_csv 
+union
+select id,nome,cpf,email,'JSON'as origem from minio.bronze.pessoa_json
+order by cpf
