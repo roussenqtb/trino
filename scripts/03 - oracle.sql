@@ -66,4 +66,4 @@ VALUES('Nelson', '999.888.777-66', 'nelson@example.com');
 INSERT INTO ESTUDO.PESSOA (nome, cpf, email)
 VALUES('Olívia', '333.444.555-66', 'olivia@example.com');
 INSERT INTO ESTUDO.PESSOA (nome, cpf, email)
-VALUES('Luiz Antonio Roussenq', '023.094.429-92','luiz@roussenq.com.br');
+VALUES('Luiz Antonio Roussenq', '356.787.900-64','luiz@roussenq.com.br');

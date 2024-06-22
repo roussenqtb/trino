@@ -9,7 +9,7 @@ CREATE TABLE pessoa.pessoa
 );
 
 INSERT INTO pessoa.pessoa (nome, cpf, email)
-VALUES('Luiz Antonio Roussenq', '023.094.429-92','luiz@roussenq.com.br');
+VALUES('Luiz Antonio Roussenq', '356.787.900-64','luiz@roussenq.com.br');
 
 INSERT INTO pessoa.pessoa (nome, cpf, email)
 VALUES('Renata Roussenq', '029.194.339-12','renata@roussenq.com.br');

@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS minio.bronze.pessoa_parquet(
   email VARCHAR
 )
 WITH (
-  external_location = 's3a://bronze/parquet',
+  external_location = 's3a://bronze/parquet/',
   format = 'PARQUET'
 );
 
