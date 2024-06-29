@@ -14,3 +14,6 @@ order by cpf;
 
 INSERT INTO postgresql.pessoa.pessoa(nome,cpf,email)
 SELECT nome,cpf,email FROM minio.bronze.pessoa_csv;
+
+CREATE TABLE postgresql.pessoa.pessoa_unificada AS
+SELECT * FROM minio.gold.pessoa;
