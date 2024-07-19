@@ -21,3 +21,6 @@ Além de bancos de dados, o Trino oferece suporte a diversos formatos de arquivo
 Desempenho Superior: Consultas distribuídas que aproveitam ao máximo a infraestrutura disponível.
 Escalabilidade: Fácil de escalar conforme suas necessidades de dados crescem.
 Comunidade Ativa: Suporte contínuo e melhorias constantes graças a uma comunidade vibrante e colaborativa.
+
+Link do Artigo com informações mais detalhadas
+https://www.linkedin.com/pulse/descubra-o-poder-do-trino-na-pratica-conectividade-e-em-roussenq-oodtf
