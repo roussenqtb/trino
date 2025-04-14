@@ -12,7 +12,6 @@ WITH (
   format = 'PARQUET'
 );
 
-
 CREATE TABLE IF NOT EXISTS minio.bronze.pessoa_csv(
   id VARCHAR,
   nome VARCHAR,

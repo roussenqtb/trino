@@ -14,4 +14,5 @@ union
 select cast(id as integer)as id,nome,cpf,email,'CSV'as origem from minio.bronze.pessoa_csv 
 union
 select id,nome,cpf,email,'JSON'as origem from minio.bronze.pessoa_json
-;
+union
+select id,nome,cpf,email,'DELTA'as origem from delta.bronze.pessoa_delta;

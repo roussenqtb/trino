@@ -1,4 +1,4 @@
-version: "3.8"
+version: '3.8'
 
 networks:
   roussenq:
@@ -6,33 +6,59 @@ networks:
 
 services:
   minio:
-    image: "minio/minio:latest"
+    image: 'minio/minio:latest'
     container_name: minio
-    hostname: minio
+    hostname: minio        
     ports:
       - "9000:9000"
       - "9001:9001"
     command: server /data --console-address ":9001"
+    #Não esquecer de comentar o volume na hora de liberar
+    #volumes:
+    #  - /mnt/d/volume/minio:/data
     environment:
       MINIO_ACCESS_KEY: minio
-      MINIO_SECRET_KEY: minio123
+      MINIO_SECRET_KEY: minio123  
     networks:
-      - roussenq
+      - roussenq              
+
+  jupyter:
+    image: quay.io/jupyter/pyspark-notebook:2024-09-01
+    container_name: jupyter
+    hostname: jupyter
+    ports:
+      - "8888:8888"
+    #volumes:
+    #  - /mnt/d/volume/jupyterlab:/home/jovyan/work
+    #  - /mnt/d/volume/spark/history:/tmp/spark-events          
+    command: /bin/sh -c " pip install PyYAML==6.0.1 py7zr minio ruamel.yaml==0.18.5 delta-spark==3.2.0 croniter==2.0.1 && start-notebook.sh --NotebookApp.token='' --NotebookApp.password='' "
+    environment:
+      - SPARK_MASTER=spark://spark-master:7077
+      - PATH_RAIZ=/home/jovyan/work
+      - MINIO_ACCESS_KEY=minio
+      - MINIO_SECRET_KEY=minio123
+      - MINIO_HOST=http://minio:9000
+      - TZ=America/Sao_Paulo
+    depends_on:
+      - spark-master
+      - minio
+    networks:
+      - roussenq         
 
   trino-coordinator:
     image: trinodb/trino:latest
-    container_name: trino-coordinator
+    container_name: trino-coordinator  
     environment:
       - TRINO_ENVIRONMENT=production
     volumes:
       - ./etc:/usr/lib/trino/etc
-      - ./catalog:/etc/trino/catalog
+      - ./catalog:/etc/trino/catalog    
     ports:
       - "8080:8080"
     depends_on:
       - minio
     networks:
-      - roussenq
+      - roussenq          
 
   trino-worker:
     image: trinodb/trino:latest
@@ -42,18 +68,18 @@ services:
       - TRINO_DISCOVERY_URI=http://trino-coordinator:8080
     volumes:
       - ./etc:/usr/lib/trino/etc
-      - ./catalog:/etc/trino/catalog
+      - ./catalog:/etc/trino/catalog    
     depends_on:
       - trino-coordinator
     networks:
-      - roussenq
+      - roussenq          
 
   hive-metastore:
-    image: "apache/hive:4.0.0"
+    image: 'apache/hive:4.0.0'
     hostname: hive-metastore
     container_name: hive
     ports:
-      - "9083:9083"
+      - '9083:9083'
     volumes:
       - ./conf/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml:ro
       - ./conf/metastore-site.xml:/opt/apache-hive-metastore-4.0.0-bin/conf/metastore-site.xml:ro
@@ -64,7 +90,88 @@ services:
     depends_on:
       - minio
     networks:
+      - roussenq          
+
+  spark-master:
+    container_name: spark_master
+    hostname: spark_master
+    build:
+      context: spark/
+      dockerfile: Dockerfile
+    environment:
+      - SPARK_MODE=master
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+    ports:
+      - "18080:8080"
+      - "7077:7077"
+    depends_on:
+      - minio
+    command: bash -c "bin/spark-class org.apache.spark.deploy.master.Master"
+    networks:
+      - roussenq        
+
+  spark-worker-1:
+    container_name: spark_worker1
+    hostname: spark_worker1  
+    build:
+      context: spark/
+      dockerfile: Dockerfile
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+      - SPARK_WORKER_MEMORY=4G
+      - SPARK_WORKER_CORES=4
+    depends_on:
+      - spark-master
+      - minio
+    command: bash -c "bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077"
+    networks:
+      - roussenq        
+
+  spark-worker-2:
+    container_name: spark_worker2
+    hostname: spark_worker2
+    build:
+      context: spark/
+      dockerfile: Dockerfile
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+      - SPARK_WORKER_MEMORY=4G
+      - SPARK_WORKER_CORES=4
+    depends_on:
+      - spark-master
+      - minio
+    command: bash -c "bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077"      
+    networks:
       - roussenq
+
+
+  spark-history-server:
+    container_name: spark_history
+    hostname: spark_history  
+    build:
+      context: spark/
+      dockerfile: Dockerfile  
+    command: /opt/bitnami/spark/sbin/start-history-server.sh
+    ports:
+      - "18081:18080"  
+    volumes:
+      - /mnt/d/volume/spark/history:/tmp/spark-events 
+    networks:
+      - roussenq
+    user: root
 
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2019-latest
@@ -77,28 +184,29 @@ services:
     ports:
       - "1433:1433"
     networks:
-      - roussenq
+      - roussenq          
 
   postgresdb:
-    image: "postgres:latest"
+    image: 'postgres:latest'
     hostname: postgresdb
+    container_name: postgresdb
     ports:
-      - "5442:5432"
+      - '5442:5432'
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: estudo
     networks:
-      - roussenq
+      - roussenq    
 
-  oracle:
+  oracle:      
     image: oracleinanutshell/oracle-xe-11g:latest
     container_name: oracle11g
-    hostname: oracle11g
+    hostname: oracle11g        
     ports:
       - 1521:1521
       - 5500:5500
-    environment:
+    environment: 
       - "ORACLE_PWD=oracle"
       - "SOURCE_SCHEMA=change-or-delete-me"
       - "SOURCE_TABLESPACE=change-or-delete-me"
@@ -107,4 +215,4 @@ services:
       #username: system
       #password: oracle
     networks:
-      - roussenq
+      - roussenq          
